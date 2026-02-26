@@ -127,18 +127,19 @@
                `3. 後續將持續針對各類刑案發生熱點，落實巡邏勤務規劃與各項防制作為。`;
     }
 
-    // 負責生成 PDF 版面的隱藏 HTML
+    // 負責生成 PDF 版面的隱藏 HTML (高畫質 1920x1080 版本)
     function buildPDFLayout() {
         let analysisTextHTML = getAnalysisText().replace(/\n/g, "<br>");
         
-        let html = `<div id="pdf-content-wrapper" style="width: 1280px; height: 720px; background: #fff; padding: 40px 50px; box-sizing: border-box; position: relative; font-family: 'Microsoft JhengHei', sans-serif;">
-            <h1 style="font-size: 34px; margin: 0 0 20px 0; font-weight: bold; color: #000;">各分局全般刑案發破數</h1>
-            <table style="width: 100%; border-collapse: collapse; font-size: 15px; text-align: center; border: 2px solid #888;">
+        // 將寬高設定為 1920x1080，並使用 flexbox 讓文字自然往下排
+        let html = `<div id="pdf-content-wrapper" style="width: 1920px; height: 1080px; background: #fff; padding: 60px 80px; box-sizing: border-box; display: flex; flex-direction: column; font-family: 'Microsoft JhengHei', sans-serif;">
+            <h1 style="font-size: 46px; margin: 0 0 20px 0; font-weight: bold; color: #000;">各分局全般刑案發破數</h1>
+            <table style="width: 100%; border-collapse: collapse; font-size: 22px; text-align: center; border: 2px solid #666;">
                 <tr>
-                    <th colspan="2" style="background: #d9d9d9; border: 1px solid #aaa; padding: 6px;">分局別</th>`;
+                    <th colspan="2" style="background: #d9d9d9; border: 1px solid #999; padding: 8px;">分局別</th>`;
         
         precinctOrder.forEach(p => {
-            html += `<th style="background: #d9d9d9; border: 1px solid #aaa; padding: 6px; width: 5.3%;">${p}</th>`;
+            html += `<th style="background: #d9d9d9; border: 1px solid #999; padding: 8px; width: 5.3%;">${p}</th>`;
         });
         html += `</tr>`;
 
@@ -148,35 +149,36 @@
 
             // 第一列
             html += `<tr>
-                <td rowspan="3" style="background: #f2f2f2; border: 1px solid #aaa; font-weight: bold; font-size: 14px;">${pText}</td>
-                <td style="border: 1px solid #aaa; padding: 5px;">發生數</td>`;
+                <td rowspan="3" style="background: #f2f2f2; border: 1px solid #999; font-weight: bold; font-size: 24px;">${pText}</td>
+                <td style="border: 1px solid #999; padding: 5px;">發生數</td>`;
             precinctOrder.forEach(p => {
                 let d = pData[p] || {occ:0, clr:0, rate:"0.00%"};
                 let occStr = period === "今年累計" ? d.occ.toLocaleString() : d.occ.toString();
-                html += `<td style="border: 1px solid #aaa; padding: 5px;">${occStr}</td>`;
+                html += `<td style="border: 1px solid #999; padding: 5px;">${occStr}</td>`;
             });
             html += `</tr>`;
 
             // 第二列
-            html += `<tr><td style="border: 1px solid #aaa; padding: 5px;">破獲數</td>`;
+            html += `<tr><td style="border: 1px solid #999; padding: 5px;">破獲數</td>`;
             precinctOrder.forEach(p => {
                 let d = pData[p] || {occ:0, clr:0, rate:"0.00%"};
                 let clrStr = period === "今年累計" ? d.clr.toLocaleString() : d.clr.toString();
-                html += `<td style="border: 1px solid #aaa; padding: 5px;">${clrStr}</td>`;
+                html += `<td style="border: 1px solid #999; padding: 5px;">${clrStr}</td>`;
             });
             html += `</tr>`;
 
             // 第三列
-            html += `<tr><td style="border: 1px solid #aaa; padding: 5px;">破獲率</td>`;
+            html += `<tr><td style="border: 1px solid #999; padding: 5px;">破獲率</td>`;
             precinctOrder.forEach(p => {
                 let d = pData[p] || {occ:0, clr:0, rate:"0.00%"};
-                html += `<td style="border: 1px solid #aaa; padding: 5px;">${d.rate}</td>`;
+                html += `<td style="border: 1px solid #999; padding: 5px;">${d.rate}</td>`;
             });
             html += `</tr>`;
         });
         html += `</table>`;
 
-        html += `<div style="position: absolute; bottom: 40px; left: 50px; font-size: 19px; font-weight: bold; line-height: 1.6; text-align: left; color: #222;">${analysisTextHTML}</div>`;
+        // 底部文字改為使用 margin-top 推開間距，不再絕對定位
+        html += `<div style="margin-top: 35px; font-size: 28px; font-weight: bold; line-height: 1.5; text-align: left; color: #222;">${analysisTextHTML}</div>`;
         html += `</div>`;
 
         document.getElementById('pdf-export-container').innerHTML = html;
@@ -245,7 +247,7 @@
                   filename:     '本週全般刑案狀況分析.pdf',
                   image:        { type: 'jpeg', quality: 1 },
                   html2canvas:  { scale: 2 },
-                  jsPDF:        { unit: 'px', format: [1280, 720], orientation: 'landscape' }
+                  jsPDF:        { unit: 'px', format: [1920, 1080], orientation: 'landscape' } // 畫布升級至 1920x1080
                 };
                 
                 html2pdf().set(opt).from(element).save().then(() => {
